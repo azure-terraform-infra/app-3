@@ -6,6 +6,10 @@ on:
       - 'stage'
   workflow_dispatch:
 
+env:
+  ORG: ${{ github.repository_owner }}
+  ENVIRONMENT: dev
+
 permissions:
   contents: read
   packages: write 
@@ -31,3 +35,4 @@ jobs:
       version: ${{ needs.timestamp.outputs.version }}
       app-name: ${{ github.event.repository.name }}
       environment: "dev"
+    secrets: inherit
