@@ -16,4 +16,3 @@ jobs:
     with:
       version: ${{ github.ref_name }}
       app-name: ${{ github.event.repository.name }}
-      # environment: ${{ github.event.client_payload.environment }}

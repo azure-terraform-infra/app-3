@@ -1,0 +1,33 @@
+name: Build App-3 Stage
+on:
+  push:
+    branches:
+      - 'dev'
+      - 'stage'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write 
+
+jobs:
+  timestamp:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.timestamp.outputs.version }}
+    steps:
+      - name: Generate timestamp
+        id: timestamp
+        run: |
+          echo "version=$(date +%Y-%m-%d-%H-%M-%S)" >> $GITHUB_OUTPUT
+
+      - name: Show version
+        run: echo "Version is ${{ steps.timestamp.outputs.version }}"
+
+  trigger-reusable-workflow:
+    needs: timestamp
+    uses: azure-terraform-infra/release-rollback-repo/.github/workflows/build-images.yaml@main
+    with:
+      version: ${{ needs.timestamp.outputs.version }}
+      app-name: ${{ github.event.repository.name }}
+      environment: "dev"
