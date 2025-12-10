@@ -25,14 +25,14 @@ permissions:
 
 jobs:
   trigger-build-images-workflow:
-    uses: DolVladzio/release-rollback-repo/.github/workflows/build-images.yaml@main
+    uses: azure-terraform-infra/release-rollback-repo/.github/workflows/build-images.yaml@main
     with:
       version: ${{ inputs.VERSION }}
       app-name: ${{ github.event.repository.name }}
 
   trigger-deploy-charts-workflow:
     needs: trigger-build-images-workflow
-    uses: DolVladzio/app-charts/.github/workflows/charts.yaml@main
+    uses: azure-terraform-infra/app-charts/.github/workflows/charts.yaml@main
     with:
       version: ${{ inputs.VERSION }}
       environment: ${{ inputs.environment }}
