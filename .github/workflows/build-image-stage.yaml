@@ -1,9 +1,8 @@
-name: Build App-3 Stage
+name: Build App-3 Dev
 on:
   push:
     branches:
       - 'dev'
-      - 'stage'
   workflow_dispatch:
 
 env:
@@ -23,7 +22,7 @@ jobs:
       - name: Generate timestamp
         id: timestamp
         run: |
-          echo "version=$(date +%Y-%m-%d-%H-%M-%S)" >> $GITHUB_OUTPUT
+          echo "version=dev-$(date +%Y-%m-%d-%H-%M-%S)" >> $GITHUB_OUTPUT
 
       - name: Show version
         run: echo "Version is ${{ steps.timestamp.outputs.version }}"
@@ -36,3 +35,21 @@ jobs:
       app-name: ${{ github.event.repository.name }}
       environment: "dev"
     secrets: inherit
+
+  trigger-hot-fix-workflow:
+    needs: [  timestamp, trigger-reusable-workflow ]
+    name: Trigger Hot Fix Workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger the App Charts runner
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.PAT }}
+          repository: ${{ env.ORG }}/app-charts
+          event-type: stage-deployment-trigger
+          client-payload: |
+            {
+              "environment": "${{ env.ENVIRONMENT }}",
+              "version": "${{ needs.timestamp.outputs.version }}",
+              "app-name": "${{ github.event.repository.name }}"
+            }
